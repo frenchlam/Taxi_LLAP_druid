@@ -28,7 +28,7 @@ touch ddl/$LOAD_DATA_FILE
 
 for YEAR in $( seq $START $END )
 do
-	for MONTH in $(seq 1 2)
+	for MONTH in $(seq 1 12)
 	do
 		if [ $MONTH -lt 10 ]
 		then 
