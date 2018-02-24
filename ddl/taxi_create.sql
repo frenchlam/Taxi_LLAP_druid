@@ -12,7 +12,7 @@ create table ny_trips_raw (
   pickup_longitude DOUBLE, 
   pickup_latitude DOUBLE,
   rate_code INT,
-  store_and_fwd_flag CHAR(2)
+  store_and_fwd_flag CHAR(2),
   dropoff_longitude DOUBLE, 
   dropoff_latitude DOUBLE, 
   payment_type CHAR(3)

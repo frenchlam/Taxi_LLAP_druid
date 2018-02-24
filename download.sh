@@ -18,7 +18,7 @@ rm -f ddl/$LOAD_DATA_FILE
 touch ddl/$LOAD_DATA_FILE
 
 
-######  Download ######
+######  Download ######	
 #cd $Data_DIR
 
 for YEAR in $( seq $START $END )
@@ -59,7 +59,7 @@ sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
 
 # create structure
-if [ $HIVE_PROTOCOL -eq "http" ]
+if [ $HIVE_PROTOCOL == "http" ]
 then 
 	echo "creating Hive structure created"
 	echo ""
