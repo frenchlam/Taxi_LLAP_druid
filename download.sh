@@ -48,7 +48,7 @@ sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
 
 ###### Push data to hdfs 
 if $(hadoop fs -test -d $HDFS_DIR ) ; 
-	then sudo -u hdfs hdfs dfs -rmdir --ignore-fail-on-non-empty $HDFS_DIR
+	then sudo -u hdfs hdfs dfs -rm -f -R -skipTrash $HDFS_DIR
 fi
 
 ##Push to hdfs

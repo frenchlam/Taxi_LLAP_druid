@@ -3,7 +3,7 @@
 
 drop table if exists ny_trips_raw ; 
 
-create table ny_trips_raw (
+create table trips_raw (
   vendor_id CHAR(3), 
   npickup_datetime STRING, 
   dropoff_datetime STRING,
@@ -15,7 +15,7 @@ create table ny_trips_raw (
   store_and_fwd_flag CHAR(2),
   dropoff_longitude DOUBLE, 
   dropoff_latitude DOUBLE, 
-  payment_type CHAR(3)
+  payment_type CHAR(3),
   fare_amount DOUBLE,
   surcharge DOUBLE, 
   mta_tax DOUBLE, 
