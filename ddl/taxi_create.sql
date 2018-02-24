@@ -1,7 +1,7 @@
 
 
 
-drop table if exists ny_trips_raw ; 
+drop table if exists trips_raw ; 
 
 create table trips_raw (
   vendor_id CHAR(3), 

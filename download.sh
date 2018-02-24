@@ -3,12 +3,15 @@ set -e -x;
 
 export Data_DIR="$(pwd)/data"
 export HDFS_DIR="/tmp/taxi_llap"
+
 export START="2012"
 export END="2012"
+
 export DATABASE="NY_taxi"
 export HIVE_PROTOCOL="http"  # binary | http
 export LLAP=false
 export PORT=10000
+export HIVE_HOST="localhost"
 
 #### Setup ######
 #create data dir
@@ -72,7 +75,7 @@ else
 fi 
 
 
-export JDBC_URL="jdbc:hive2://localhost:$PORT/$TRANSPORT_MODE"
+export JDBC_URL="jdbc:hive2://$HIVE_HOST:$PORT/$TRANSPORT_MODE"
 
 #load data
 echo "creating Hive structure created"
