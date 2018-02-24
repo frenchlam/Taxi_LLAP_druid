@@ -33,9 +33,11 @@ do
 		if [ $MONTH -lt 10 ]
 		then 
 			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-0$MONTH.csv -P data/
+			bzip2 --fast data/yellow_tripdata_$YEAR-0$MONTH.csv
 			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
 		else
 			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
+			bzip2 --fast data/yellow_tripdata_$YEAR-$MONTH.csv
 			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
 		fi 
 		echo "yellow_tripdata_$YEAR-$MONTH.csv : OK"
