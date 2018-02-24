@@ -32,10 +32,10 @@ do
 	do
 		if [ $MONTH -lt 10 ]
 		then 
-			echo -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-0$MONTH.csv -P data/
+			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-0$MONTH.csv -P data/
 			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
 		else
-			echo -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
+			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
 			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
 		fi 
 		echo "yellow_tripdata_$YEAR-$MONTH.csv : OK"
@@ -43,15 +43,7 @@ do
 	done
 done
 
-
-
-#create table structure
-sed -i "1s/^/use ${DATABASE};/" ddl/taxi_create.sql
-sed -i '1i\\' ddl/taxi_create.sql
-sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
-
-
-###### Push data to hdfs 
+#Push data to hdfs 
 if $(hadoop fs -test -d $HDFS_DIR ) ; 
 	then sudo -u hdfs hdfs dfs -rm -f -R -skipTrash $HDFS_DIR
 fi
@@ -63,6 +55,12 @@ sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
 ####### create Hive Structure
 
+#create table structure
+sed -i "1s/^/use ${DATABASE};/" ddl/taxi_create.sql
+sed -i '1i\\' ddl/taxi_create.sql
+sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
+
+
 #build jdbc URL 
 if [ $HIVE_PROTOCOL == "http" ]
 then 
@@ -73,7 +71,6 @@ else
 	export TRANSPORT_MODE=""
 	if $LLAP; then export PORT=10500; fi
 fi 
-
 
 export JDBC_URL="jdbc:hive2://$HIVE_HOST:$PORT/$TRANSPORT_MODE"
 
