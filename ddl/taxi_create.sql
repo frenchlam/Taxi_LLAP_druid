@@ -1,7 +1,6 @@
 
 
 
-
 drop table if exists ny_trips_raw ; 
 
 create table ny_trips_raw (

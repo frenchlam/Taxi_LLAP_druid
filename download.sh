@@ -42,9 +42,9 @@ done
 #create table structure
 #cd $Data_DIR
 
+sed -i "1s/^/use ${DATABASE};/" ddl/taxi_create.sql
 sed -i '1i\\' ddl/taxi_create.sql
-sed -i '1s/^/use ${DATABASE};/' ddl/taxi_create.sql
-sed -i '1s/^/create database if not exists ${DATABASE};/' ddl/taxi_create.sql
+sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
 
 
 ###### load data
