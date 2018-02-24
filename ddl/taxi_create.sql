@@ -7,11 +7,11 @@ create table ny_trips_raw (
   vendor_id CHAR(3), 
   npickup_datetime STRING, 
   dropoff_datetime STRING,
-  passenger_count int, 
+  passenger_count INT, 
   trip_distance DOUBLE, 
   pickup_longitude DOUBLE, 
   pickup_latitude DOUBLE,
-  rate_code int,
+  rate_code INT,
   store_and_fwd_flag CHAR(2)
   dropoff_longitude DOUBLE, 
   dropoff_latitude DOUBLE, 

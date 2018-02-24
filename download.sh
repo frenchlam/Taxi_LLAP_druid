@@ -3,9 +3,10 @@ set -e -x;
 
 export Data_DIR="$(pwd)/data"
 export HDFS_DIR="/tmp/taxi_llap"
-export START="2016"
-export END="2016"
+export START="2012"
+export END="2012"
 export DATABASE="NY_taxi"
+export HIVE_PROTOCOL="http"  # binary | http
 
 #### Setup ######
 #create data dir
@@ -40,25 +41,9 @@ done
 
 
 #create table structure
-#cd $Data_DIR
-
 sed -i "1s/^/use ${DATABASE};/" ddl/taxi_create.sql
 sed -i '1i\\' ddl/taxi_create.sql
 sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
-
-
-###### load data
-#create sql load file 
-#LOAD_DATA_FILE="load_data_text.sql"
-
-#rm -f ../ddl/$LOAD_DATA_FILE
-#touch ../ddl/$LOAD_DATA_FILE
-
-
-#for YEAR in $( seq $START $END )
-#do
-#	echo "LOAD DATA INPATH '$HDFS_DIR/data/$YEAR.csv.bz2' INTO TABLE $DATABASE.flights_raw ;" >> ../ddl/$LOAD_DATA_FILE
-#done
 
 
 ###### Push data to hdfs 
@@ -74,11 +59,26 @@ sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
 
 # create structure
-beeline -u jdbc:hive2://localhost:10000/ -n hive -f ddl/taxi_create.sql
-echo "structure created"
+if [ $HIVE_PROTOCOL -eq "http" ]
+then 
+	echo "creating Hive structure created"
+	echo ""
+	beeline -u 'jdbc:hive2://localhost:10001/;transportMode=http;httpPath=cliservice' -n hive -f ddl/taxi_create.sql
+	echo "OK"
+	echo ""
+	echo "loading data"
+	echo ""
+	beeline -u 'jdbc:hive2://localhost:10001/;transportMode=http;httpPath=cliservice' -n hive -f ddl/$LOAD_DATA_FILE
+	echo "OK"
 
-: <<'END'
-#load data 
-echo "loading data"
-beeline -u jdbc:hive2://localhost:10000/ -n hive -f ddl/$LOAD_DATA_FILE
-END
+else 
+	beeline -u 'jdbc:hive2://localhost:10000/' -n hive -f ddl/taxi_create.sql
+	echo "structure created"
+	echo "OK"
+	echo ""
+	echo "loading data"
+	echo ""
+	beeline -u 'jdbc:hive2://localhost:10000/' -n hive -f ddl/$LOAD_DATA_FILE
+	echo "OK"
+fi 
+
