@@ -7,6 +7,8 @@ export START="2012"
 export END="2012"
 export DATABASE="NY_taxi"
 export HIVE_PROTOCOL="http"  # binary | http
+export LLAP=false
+export PORT=10000
 
 #### Setup ######
 #create data dir
@@ -51,34 +53,36 @@ if $(hadoop fs -test -d $HDFS_DIR ) ;
 	then sudo -u hdfs hdfs dfs -rm -f -R -skipTrash $HDFS_DIR
 fi
 
-##Push to hdfs
 hdfs dfs -mkdir -p $HDFS_DIR
 hdfs dfs -copyFromLocal -f $Data_DIR/ $HDFS_DIR/
 sudo -u hdfs hdfs dfs -chmod -R 777 $HDFS_DIR
 sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
+####### create Hive Structure
 
-# create structure
+#build jdbc URL 
 if [ $HIVE_PROTOCOL == "http" ]
 then 
-	echo "creating Hive structure created"
-	echo ""
-	beeline -u 'jdbc:hive2://localhost:10001/;transportMode=http;httpPath=cliservice' -n hive -f ddl/taxi_create.sql
-	echo "OK"
-	echo ""
-	echo "loading data"
-	echo ""
-	beeline -u 'jdbc:hive2://localhost:10001/;transportMode=http;httpPath=cliservice' -n hive -f ddl/$LOAD_DATA_FILE
-	echo "OK"
+	export TRANSPORT_MODE=";transportMode=http;httpPath=cliservice"
+	if $LLAP; then export PORT=10500; else export PORT=10001; fi
 
 else 
-	beeline -u 'jdbc:hive2://localhost:10000/' -n hive -f ddl/taxi_create.sql
-	echo "structure created"
-	echo "OK"
-	echo ""
-	echo "loading data"
-	echo ""
-	beeline -u 'jdbc:hive2://localhost:10000/' -n hive -f ddl/$LOAD_DATA_FILE
-	echo "OK"
+	export TRANSPORT_MODE=""
+	if $LLAP; then export PORT=10500; fi
 fi 
+
+
+export JDBC_URL="jdbc:hive2://localhost:$PORT/$TRANSPORT_MODE"
+
+#load data
+echo "creating Hive structure created"
+echo ""
+beeline -u $JDBC_URL -n hive -f ddl/taxi_create.sql
+echo "OK"
+echo ""
+echo "loading data"
+echo ""
+beeline -u $JDBC_URL -n hive -f ddl/$LOAD_DATA_FILE
+echo ""
+echo "OK"
 
