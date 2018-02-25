@@ -1,8 +1,6 @@
 
 
 
-DROP TABLE IF EXISTS trips_raw PURGE; 
-
 CREATE TABLE trips_raw (
   vendor_id CHAR(3), 
   npickup_datetime STRING, 

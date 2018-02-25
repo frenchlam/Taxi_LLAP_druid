@@ -13,14 +13,15 @@ export LLAP=false
 export PORT=10000
 export HIVE_HOST="localhost"
 
+export OVERWRITE_TABLE=false
+
 #### Setup ######
 #create data dir
 mkdir -p $Data_DIR
 
 #create sql load file 
-LOAD_DATA_FILE="load_data_text.sql"
-rm -f ddl/$LOAD_DATA_FILE
-touch ddl/$LOAD_DATA_FILE
+rm -f ddl/load_data_text.sql
+touch ddl/load_data_text.sql
 
 
 ######  Download ######	
@@ -36,16 +37,16 @@ do
 			if [ ! -f "data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2" ] ; then
 				bzip2 --fast -f data/yellow_tripdata_$YEAR-0$MONTH.csv
 			fi
-			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
-			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/load_data_text.sql
+			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/load_data_text.sql
 
 		else
 			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
 			if [ ! -f "data/yellow_tripdata_$YEAR-$MONTH.csv.bz2" ] ; then
 				bzip2 --fast data/yellow_tripdata_$YEAR-$MONTH.csv
 			fi
-			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
-			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/load_data_text.sql
+			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/load_data_text.sql
 
 		fi 
 		echo "yellow_tripdata_$YEAR-$MONTH.csv : OK"
@@ -66,10 +67,17 @@ sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
 ####### create Hive Structure
 #create table structure
+if $OVERWRITE_TABLE; then
+	sed -i "1s/^/DROP TABLE IF EXISTS trips_raw PURGE;/" ddl/taxi_create.sql
+	sed -i '1i\\' ddl/taxi_create.sql
+fi
+
 sed -i "1s/^/use ${DATABASE};/" ddl/taxi_create.sql
-sed -i "1s/^/use ${DATABASE};/" ddl/taxi_to_orc.sql
 sed -i '1i\\' ddl/taxi_create.sql
 sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
+
+sed -i "1s/^/use ${DATABASE};/" ddl/taxi_to_orc.sql
+
 
 
 #build jdbc URL 
@@ -86,14 +94,17 @@ fi
 export JDBC_URL="jdbc:hive2://$HIVE_HOST:$PORT/$TRANSPORT_MODE"
 
 #load data
-echo "creating Hive structure created"
-echo ""
-beeline -u $JDBC_URL -n hive -f ddl/taxi_create.sql
-echo "OK"
-echo ""
+if $OVERWRITE_TABLE; then
+	echo "creating Hive structure"
+	echo ""
+	beeline -u $JDBC_URL -n hive -f ddl/taxi_create.sql
+	echo "OK"
+	echo ""
+fi 
+
 echo "loading data"
 echo ""
-beeline -u $JDBC_URL -n hive -f ddl/$LOAD_DATA_FILE
+beeline -u $JDBC_URL -n hive -f ddl/load_data_text.sql
 echo ""
 echo "OK"
 
