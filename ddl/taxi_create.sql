@@ -1,9 +1,9 @@
 
 
 
-drop table if exists trips_raw ; 
+DROP TABLE IF EXISTS trips_raw PURGE; 
 
-create table trips_raw (
+CREATE TABLE trips_raw (
   vendor_id CHAR(3), 
   npickup_datetime STRING, 
   dropoff_datetime STRING,

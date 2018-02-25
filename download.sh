@@ -33,12 +33,16 @@ do
 		if [ $MONTH -lt 10 ]
 		then 
 			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-0$MONTH.csv -P data/
-			bzip2 --fast data/yellow_tripdata_$YEAR-0$MONTH.csv
-			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+			#bzip2 --fast -f data/yellow_tripdata_$YEAR-0$MONTH.csv
+			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+
 		else
 			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
-			bzip2 --fast data/yellow_tripdata_$YEAR-$MONTH.csv
-			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+			#bzip2 --fast -f data/yellow_tripdata_$YEAR-$MONTH.csv
+			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv.bz2' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+			echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/$LOAD_DATA_FILE
+
 		fi 
 		echo "yellow_tripdata_$YEAR-$MONTH.csv : OK"
 		sleep 1
@@ -51,7 +55,8 @@ if $(hadoop fs -test -d $HDFS_DIR ) ;
 fi
 
 hdfs dfs -mkdir -p $HDFS_DIR
-hdfs dfs -copyFromLocal -f $Data_DIR/ $HDFS_DIR/
+#hdfs dfs -copyFromLocal -f $Data_DIR/*.bz2 $HDFS_DIR/
+hdfs dfs -copyFromLocal -f $Data_DIR/*.csv $HDFS_DIR/
 sudo -u hdfs hdfs dfs -chmod -R 777 $HDFS_DIR
 sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
@@ -59,6 +64,7 @@ sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
 #create table structure
 sed -i "1s/^/use ${DATABASE};/" ddl/taxi_create.sql
+sed -i "1s/^/use ${DATABASE};/" ddl/taxi_to_orc.sql
 sed -i '1i\\' ddl/taxi_create.sql
 sed -i "1s/^/create database if not exists ${DATABASE};/" ddl/taxi_create.sql
 
