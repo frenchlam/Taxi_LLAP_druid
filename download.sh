@@ -15,6 +15,8 @@ export HIVE_HOST="localhost"
 
 export OVERWRITE_TABLE=false
 
+
+
 #### Setup ######
 #create data dir
 mkdir -p $Data_DIR
