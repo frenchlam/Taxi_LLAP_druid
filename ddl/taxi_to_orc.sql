@@ -6,9 +6,11 @@ set hive.optimize.sort.dynamic.partition=true;
 DROP TABLE if exists trips PURGE;
 
 CREATE TABLE trips (
+  year int, 
+  month int,
   weekofyear int,
   DayofMonth int,
-  vendor_id CHAR(3), 
+  vendor_id STRING, 
   npickup_datetime TIMESTAMP, 
   dropoff_datetime TIMESTAMP,
   passenger_count INT, 
@@ -16,10 +18,10 @@ CREATE TABLE trips (
   pickup_longitude DOUBLE, 
   pickup_latitude DOUBLE,
   rate_code INT,
-  store_and_fwd_flag CHAR(2),
+  store_and_fwd_flag STRING,
   dropoff_longitude DOUBLE, 
   dropoff_latitude DOUBLE, 
-  payment_type CHAR(3),
+  payment_type STRING,
   fare_amount FLOAT,
   surcharge FLOAT, 
   mta_tax FLOAT, 
@@ -27,13 +29,13 @@ CREATE TABLE trips (
   tolls_amount FLOAT, 
   total_amount FLOAT
 ) 
-PARTITIONED BY (year int, month int)
-CLUSTERED BY (vendor_id) SORTED BY (DayofMonth) into 10 buckets
+PARTITIONED BY (yearmonth STRING)
+CLUSTERED BY (weekofyear) SORTED BY (DayofMonth) into 7 buckets
 STORED AS ORC
 TBLPROPERTIES("orc.bloom.filter.columns"="*")
 ;
 
-insert overwrite table trips partition(year, month) 
+insert overwrite table trips partition(yearmonth) 
 select
   year(cast(npickup_datetime as timestamp)) as year,
   month(cast(npickup_datetime as timestamp)) as month,
@@ -56,7 +58,8 @@ select
   cast(round(mta_tax,2)as float) as mta_tax,
   cast(round(tip_amount,2)as float) as tip_amount, 
   cast(round(tolls_amount,2)as float) as tolls_amount, 
-  cast(round(total_amount,2)as float) as total_amount
-from trips_raw2 
+  cast(round(total_amount,2)as float) as total_amount,
+  date_format(cast(npickup_datetime as timestamp),'yyyyMM') as yearmonth
+from trips_raw
 ;
 #where year(cast(npickup_datetime as timestamp)) = 2012 and month(cast(npickup_datetime as timestamp)) in (1,2,3)
