@@ -3,7 +3,7 @@
 
 CREATE TABLE trips_raw (
   vendor_id CHAR(3), 
-  npickup_datetime STRING, 
+  pickup_datetime STRING, 
   dropoff_datetime STRING,
   passenger_count INT, 
   trip_distance DOUBLE, 
@@ -29,3 +29,4 @@ WITH SERDEPROPERTIES (
 )  
 stored as textfile 
 tblproperties ("skip.header.line.count"="2");
+

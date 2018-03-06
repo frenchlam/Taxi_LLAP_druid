@@ -30,16 +30,17 @@ CREATE TABLE trips (
   total_amount FLOAT
 ) 
 PARTITIONED BY (yearmonth STRING)
-CLUSTERED BY (weekofyear) SORTED BY (DayofMonth) into 7 buckets
+CLUSTERED BY (weekofyear) into 4 buckets
 STORED AS ORC
-TBLPROPERTIES("orc.bloom.filter.columns"="*")
+TBLPROPERTIES("orc.bloom.filter.columns"= "year,month,weekofyear,DayofMonth,rate_code",
+  "orc.create.index"="true"  )
 ;
 
 insert overwrite table trips partition(yearmonth) 
 select
   year(cast(npickup_datetime as timestamp)) as year,
   month(cast(npickup_datetime as timestamp)) as month,
-  weekofyear (cast(npickup_datetime as timestamp)) as weekofyear,
+  weekofyear(cast(npickup_datetime as timestamp)) as weekofyear,
   day(cast(npickup_datetime as timestamp)) as DayofMonth,
   vendor_id,
   cast(npickup_datetime AS timestamp) AS npickup_datetime,
@@ -61,5 +62,8 @@ select
   cast(round(total_amount,2)as float) as total_amount,
   date_format(cast(npickup_datetime as timestamp),'yyyyMM') as yearmonth
 from trips_raw
-;
-#where year(cast(npickup_datetime as timestamp)) = 2012 and month(cast(npickup_datetime as timestamp)) in (1,2,3)
+--where year(cast(npickup_datetime as timestamp)) = 2012 and month(cast(npickup_datetime as timestamp)) in (1,2,3,4,5)
+Cluster by npickup_datetime ;
+
+
+
