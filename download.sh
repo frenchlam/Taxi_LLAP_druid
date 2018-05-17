@@ -8,12 +8,12 @@ export START="2012"
 export END="2012"
 
 export DATABASE="NY_taxi"
-export HIVE_PROTOCOL="http"  # binary | http
+export HIVE_PROTOCOL="binary"  # binary | http
 export LLAP=false
 export PORT=10000
 export HIVE_HOST="localhost"
 
-export OVERWRITE_TABLE=false
+export OVERWRITE_TABLE=true
 
 
 
@@ -87,7 +87,8 @@ if [ $HIVE_PROTOCOL == "http" ]
 then 
 	export TRANSPORT_MODE=";transportMode=http;httpPath=cliservice"
 	if $LLAP; then export PORT=10500; else export PORT=10001; fi
-
+	## must add line to change optimize.sh
+	
 else 
 	export TRANSPORT_MODE=""
 	if $LLAP; then export PORT=10500; fi

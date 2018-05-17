@@ -1,0 +1,46 @@
+<topology>
+
+    <gateway>
+        <provider>
+            <role>authentication</role>
+            <name>Anonymous</name>
+            <enabled>true</enabled>
+        </provider>
+        <provider>
+            <role>identity-assertion</role>
+            <name>Default</name>
+            <enabled>false</enabled>
+        </provider>
+        <provider>
+            <role>authorization</role>
+            <name>XASecurePDPKnox</name>
+            <enabled>true</enabled>
+        </provider>
+    </gateway>
+
+    <service>
+        <role>ZEPPELINUI</role>
+        <url>http://llap-demo-1.hdpcloud.internal:9995</url>
+    </service>
+
+    <service>
+        <role>AMBARI</role>
+        <url>http://llap-demo-1.hdpcloud.internal:8080</url>
+   </service>
+
+   <service>
+        <role>AMBARIUI</role>
+        <url>http://llap-demo-1.hdpcloud.internal:8080</url>
+    </service>
+
+    <service>
+        <role>RANGERUI</role>
+        <url>http://llap-demo-1.hdpcloud.internal:6080</url>
+    </service>
+
+    <service>
+        <role>RANGER</role>
+        <url>http://llap-demo-1.hdpcloud.internal:6080</url>
+    </service>
+
+</topology>

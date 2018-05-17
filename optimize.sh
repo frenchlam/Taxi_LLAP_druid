@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e -x;
 export DATABASE="NY_taxi"
-export HIVE_PROTOCOL="http"  # binary | http
+export HIVE_PROTOCOL="binary"  # binary | http
 export LLAP=false
 export PORT=10000
 export HIVE_HOST="localhost"

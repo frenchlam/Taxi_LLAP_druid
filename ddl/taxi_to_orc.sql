@@ -33,8 +33,7 @@ PARTITIONED BY (yearmonth STRING)
 CLUSTERED BY (weekofyear) into 4 buckets
 STORED AS ORC
 TBLPROPERTIES("orc.bloom.filter.columns"= "year,month,weekofyear,DayofMonth,rate_code",
-  "orc.create.index"="true"  )
-;
+  "orc.create.index"="true"  ) ;
 
 insert overwrite table trips partition(yearmonth) 
 select
@@ -63,7 +62,6 @@ select
   date_format(cast(npickup_datetime as timestamp),'yyyyMM') as yearmonth
 from trips_raw
 --where year(cast(npickup_datetime as timestamp)) = 2012 and month(cast(npickup_datetime as timestamp)) in (1,2,3,4,5)
-Cluster by npickup_datetime ;
-
+DISTRIBUTE BY date_format(cast(npickup_datetime as timestamp),'yyyyMM') SORT BY npickup_datetime ;
 
 
