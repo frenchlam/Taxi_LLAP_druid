@@ -61,9 +61,9 @@ if $(hadoop fs -test -d $HDFS_DIR ) ;
 	then sudo -u hdfs hdfs dfs -rm -f -R -skipTrash $HDFS_DIR
 fi
 
-hdfs dfs -mkdir -p $HDFS_DIR
+hdfs dfs -mkdir -p $HDFS_DIR/data
 #hdfs dfs -copyFromLocal -f $Data_DIR/*.bz2 $HDFS_DIR/
-hdfs dfs -copyFromLocal -f $Data_DIR/data/*.csv.bz2 $HDFS_DIR/data
+hdfs dfs -copyFromLocal -f $Data_DIR/*.csv.bz2 $HDFS_DIR/data
 sudo -u hdfs hdfs dfs -chmod -R 777 $HDFS_DIR
 sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
