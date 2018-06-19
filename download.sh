@@ -8,8 +8,8 @@ export START="2012"
 export END="2012"
 
 export DATABASE="NY_taxi"
-export HIVE_PROTOCOL="binary"  # binary | http
-export LLAP=false
+export HIVE_PROTOCOL="http"  # binary | http
+export LLAP=true
 export PORT=10000
 export HIVE_HOST="localhost"
 
@@ -35,7 +35,10 @@ do
 	do
 		if [ $MONTH -lt 10 ]
 		then 
-			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-0$MONTH.csv -P data/
+			if [ ! -f "data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2" ] ; then
+				wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-0$MONTH.csv -P data/
+			fi
+
 			if [ ! -f "data/yellow_tripdata_$YEAR-0$MONTH.csv.bz2" ] ; then
 				bzip2 --fast -f data/yellow_tripdata_$YEAR-0$MONTH.csv
 			fi
@@ -43,7 +46,9 @@ do
 			#echo "LOAD DATA INPATH '$HDFS_DIR/data/yellow_tripdata_$YEAR-0$MONTH.csv' INTO TABLE $DATABASE.trips_raw ;" >> ddl/load_data_text.sql
 
 		else
-			wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
+			if [ ! -f "data/yellow_tripdata_$YEAR-$MONTH.csv.bz2" ] ; then
+				wget -c https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_$YEAR-$MONTH.csv -P data/
+			fi
 			if [ ! -f "data/yellow_tripdata_$YEAR-$MONTH.csv.bz2" ] ; then
 				bzip2 --fast data/yellow_tripdata_$YEAR-$MONTH.csv
 			fi
@@ -86,7 +91,7 @@ sed -i "1s/^/use ${DATABASE};/" ddl/taxi_to_orc.sql
 if [ $HIVE_PROTOCOL == "http" ]
 then 
 	export TRANSPORT_MODE=";transportMode=http;httpPath=cliservice"
-	if $LLAP; then export PORT=10500; else export PORT=10001; fi
+	if $LLAP; then export PORT=10501; else export PORT=10001; fi
 	## must add line to change optimize.sh
 
 else 
