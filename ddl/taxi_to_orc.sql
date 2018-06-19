@@ -1,7 +1,21 @@
 
 
 set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.enforce.bucketing=true;
+set hive.enforce.sorting=true;
+set hive.exec.max.dynamic.partitions.pernode=100000;
+set hive.exec.max.dynamic.partitions=100000;
+set hive.exec.max.created.files=1000000;
+set hive.exec.parallel=true;
+set hive.exec.reducers.max=2000;
+set hive.stats.autogather=true;
 set hive.optimize.sort.dynamic.partition=true;
+SET hive.vectorized.execution.enabled = true;
+SET hive.vectorized.execution.reduce.enabled=true;
+SET hive.cbo.enable=true;
+SET hive.compute.query.using.stats = true;
+
+
 
 DROP TABLE if exists trips PURGE;
 
@@ -61,7 +75,7 @@ select
   cast(round(total_amount,2)as float) as total_amount,
   date_format(cast(npickup_datetime as timestamp),'yyyyMM') as yearmonth
 from trips_raw
---where year(cast(npickup_datetime as timestamp)) = 2012 and month(cast(npickup_datetime as timestamp)) in (1,2,3,4,5)
-DISTRIBUTE BY date_format(cast(npickup_datetime as timestamp),'yyyyMM') SORT BY npickup_datetime ;
+--where year(cast(npickup_datetime as timestamp)) = 2012 and month(cast(npickup_datetime as timestamp)) in (1,2)
+DISTRIBUTE BY date_format(cast(npickup_datetime as timestamp),'yyyyMMw') SORT BY npickup_datetime ;
 
 

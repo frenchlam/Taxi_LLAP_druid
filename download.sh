@@ -63,7 +63,7 @@ fi
 
 hdfs dfs -mkdir -p $HDFS_DIR
 #hdfs dfs -copyFromLocal -f $Data_DIR/*.bz2 $HDFS_DIR/
-hdfs dfs -copyFromLocal -f $Data_DIR/data/*.csv.bz2 $HDFS_DIR/
+hdfs dfs -copyFromLocal -f $Data_DIR/data/*.csv.bz2 $HDFS_DIR/data
 sudo -u hdfs hdfs dfs -chmod -R 777 $HDFS_DIR
 sudo -u hdfs hdfs dfs -chown -R hive:hdfs $HDFS_DIR
 
@@ -88,7 +88,7 @@ then
 	export TRANSPORT_MODE=";transportMode=http;httpPath=cliservice"
 	if $LLAP; then export PORT=10500; else export PORT=10001; fi
 	## must add line to change optimize.sh
-	
+
 else 
 	export TRANSPORT_MODE=""
 	if $LLAP; then export PORT=10500; fi
